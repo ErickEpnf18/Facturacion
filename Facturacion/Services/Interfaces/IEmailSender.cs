@@ -1,4 +1,4 @@
-﻿namespace NesFactApiV4.Services.Interfaces
+﻿namespace Facturacion.Services.Interfaces
 {
     public interface IEmailSender
     {

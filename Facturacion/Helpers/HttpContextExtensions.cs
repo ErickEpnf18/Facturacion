@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace NesFactApiV4.Helpers
+namespace Facturacion.Helpers
 {
     public static class HttpContextExtensions
     {

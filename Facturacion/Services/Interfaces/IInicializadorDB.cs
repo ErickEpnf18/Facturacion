@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace NesFactApiV4.Services.Interfaces
+namespace Facturacion.Services.Interfaces
 {
     public interface IInicializadorDB
     {

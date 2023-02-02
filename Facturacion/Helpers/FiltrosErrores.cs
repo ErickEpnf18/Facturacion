@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace NesFactApiV4.Helpers
+namespace Facturacion.Helpers
 {
     public class FiltrosErrores : ExceptionFilterAttribute
     {

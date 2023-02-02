@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace NesFactApiV4.Middleware
+namespace Facturacion.Middleware
 {
     public class CParametrosGenerales
     {  

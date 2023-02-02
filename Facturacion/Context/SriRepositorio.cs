@@ -10,7 +10,6 @@ namespace Facturacion.Context
     public partial class SriRepositorio
     {
         public int Id { get; set; }
-        public string PersonaSociedad { get; set; }
         public string RepresentanteLegal { get; set; }
         public string Obligado { get; set; }
         public string NombreComercial { get; set; }

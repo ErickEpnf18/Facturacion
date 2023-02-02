@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NesFactApiV4.Helpers.Paginacion
+namespace Facturacion.Helpers.Paginacion
 {
     public class PaginacionDTO
     {

@@ -1,6 +1,6 @@
-﻿using NesFactApiV4.Helpers.Paginacion;
+﻿using Facturacion.Helpers.Paginacion;
 
-namespace NesFactApiV4.Helpers
+namespace Facturacion.Helpers
 {
     public static class QueryableExtensions
     {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace NesFactApiV4.Helpers
+namespace Facturacion.Helpers
 {
     public static class Extensions
     {

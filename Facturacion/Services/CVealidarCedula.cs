@@ -1,4 +1,4 @@
-﻿namespace NesFactApiV4.Services
+﻿namespace Facturacion.Services
 {
     public class CVealidarCedula
     {

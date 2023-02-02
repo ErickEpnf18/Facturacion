@@ -1,16 +1,18 @@
 ﻿using AutoMapper;
 using Facturacion.Context;
+using Facturacion.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-
-using NesFactApiV4.Services.Interfaces;
+using Facturacion.Model;
+using Facturacion.Services.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Facturacion.DTOs;
 
 namespace Facturacion.Controllers
 {
@@ -18,7 +20,7 @@ namespace Facturacion.Controllers
     [Route("api/AdminEmpresa")]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
 
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "AdminNes")]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "AdminNes")]
 
     public class EmpresaAdminController : Controller
     {
@@ -37,7 +39,7 @@ namespace Facturacion.Controllers
 
         public EmpresaAdminController(UserManager<NetUserAditional> userManager,
             SignInManager<NetUserAditional> signInManager, IConfiguration configuration, AplicationDbContext context,
-            IMapper mapper, IAlmacenadorArchivos almacenadorArchivos, IEmailSender emailSender, 
+            IMapper mapper, IAlmacenadorArchivos almacenadorArchivos, IEmailSender emailSender,
             IWebHostEnvironment webHostEnvironment)
         {
 
@@ -66,134 +68,117 @@ namespace Facturacion.Controllers
         [HttpPost("PostEmpresaAdmin")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ViewEmpresa>> PostEmpresaAdmin([FromBody] PostEmpresa postEmpresaCreada)
+        public async Task<ActionResult<ViewEmpresa>> PostEmpresaAdmin([FromBody] IngresoRepoSriDto ingresoRepoSriDto)
         {
-            var curentUser = HttpContext.User;
-            var claims = curentUser.Claims.ToList();
-            if (claims.Count == 0)
-                return BadRequest("No tiene permiso para esta seccion");
-            //  AdminEmpresaDueno
+            //var curentUser = HttpContext.User;
+            //var claims = curentUser.Claims.ToList();
+            //if (claims.Count == 0)
+            //    return BadRequest("No tiene permiso para esta seccion");
+            ////  AdminEmpresaDueno
 
             Random generator = new Random();
             String numeroGenerado = generator.Next(0, 100000000).ToString("D6");
             SriRepositorio? sriRepositorio = null;
-            sriRepositorio = await context.SriRepositorios.FirstOrDefaultAsync(x => x.NumeroRuc.Equals(postEmpresaCreada.Ruc));
+            sriRepositorio = await context.SriRepositorios.FirstOrDefaultAsync(x => x.NumeroRuc.Equals(ingresoRepoSriDto.NumeroRuc));
 
             if (sriRepositorio == null)
             {
-                var getsriRepositorio = cConsultaSri.GetRucSri(postEmpresaCreada.Ruc);
-                if (getsriRepositorio == null)
-                    return BadRequest($"No existe Contribuyente con el siguiente Ruc {postEmpresaCreada.Ruc}");
-                sriRepositorio = mapper.Map<SriRepositorio>(getsriRepositorio);
 
-                Informacionfechascontribuyente informacionfechascontribuyente = new Informacionfechascontribuyente();
-                PersonaMiPyme1 personaMiPyme = new PersonaMiPyme1();
-                List<PersonaEstablecimientosRuc> personaEstablecimientosRucs = new List<PersonaEstablecimientosRuc>();
-                informacionfechascontribuyente = mapper.Map<Informacionfechascontribuyente>(getsriRepositorio.modelInformacionfechascontribuyente);
-                personaMiPyme = mapper.Map<PersonaMiPyme1>(getsriRepositorio.modelPersonaMiPyme);
-                personaEstablecimientosRucs = mapper.Map<List<PersonaEstablecimientosRuc>>(getsriRepositorio.modelPersonaEstablecimientosRucs);
+                //if (getsriRepositorio == null)
+                //    return BadRequest($"No existe Contribuyente con el siguiente Ruc {postEmpresaCreada.Ruc}");
+                //sriRepositorio = mapper.Map<SriRepositorio>(getsriRepositorio);
+
+
                 try
                 {
-
-                    await context.AddAsync(sriRepositorio);
+                    var EmpresaMappe = mapper.Map<SriRepositorio>(ingresoRepoSriDto);
+                    await context.AddAsync(EmpresaMappe);
                     await context.SaveChangesAsync();
-                    if (personaMiPyme != null)
-                    {
-                        personaMiPyme.FkSriRepositorio = sriRepositorio.Id;
-                        await context.AddAsync(personaMiPyme);
-                        await context.SaveChangesAsync();
-                    }
-                    if (informacionfechascontribuyente != null)
-                    {
-                        informacionfechascontribuyente.FkSriRepositorio = sriRepositorio.Id;
-                        await context.AddAsync(informacionfechascontribuyente);
-                        await context.SaveChangesAsync();
-                    }
-                    if (personaEstablecimientosRucs != null)
-                    {
-                        foreach (var item in personaEstablecimientosRucs)
-                        {
-                            item.FkSri = sriRepositorio.Id;
-                            await context.AddAsync(item);
-                            await context.SaveChangesAsync();
 
-                        };
-                    }
+                    return Ok(new ViewEmpresaDto
+                    {
+                        Id = EmpresaMappe.Id,
+                        EmpresaRuc = EmpresaMappe.NumeroRuc,
+
+                        Mensaje = "Usuario Empresa Creada Satisfactoriamente"
+                    });
                 }
                 catch (Exception ex)
                 {
 
                     var exasd = ex.ToString();
+                    return BadRequest(exasd);
                 }
+            
 
             }
+            return BadRequest();
+            //var identityUser = await _userManager.FindByEmailAsync(postEmpresaCreada.Email);
+            //if (identityUser != null)
+            //    return BadRequest($"Ya existe Empresa con ese  correo {identityUser.Email},Empresa= {identityUser.FkEmpresa}");
 
-            var identityUser = await _userManager.FindByEmailAsync(postEmpresaCreada.Email);
-            if (identityUser != null)
-                return BadRequest($"Ya existe Empresa con ese  correo {identityUser.Email},Empresa= {identityUser.FkEmpresa}");
-
-            var empresa = new Empresa
-            {
-                EmpresaRuc = sriRepositorio.NumeroRuc,
-                EmpresaPropietario = sriRepositorio.RazonSocial,
-                EmpresaEmail = postEmpresaCreada.Email,
-                EmpresaEstado = true,
-                EmpresaUsuarioCreador = claims[0].Value,
-                EmpresaTelefono = postEmpresaCreada.Telefono,
-
-
-            };
-            await context.AddAsync(empresa);
-            await context.SaveChangesAsync();
-
-            string EmpresaCarpeta = Path.Combine(webHostEnvironment.WebRootPath, "DatosEmpresaAdmin-" + sriRepositorio.NumeroRuc);
-
-            var user = new NetUserAditional
-            {
-                UserName = postEmpresaCreada.Ruc,
-                Email = postEmpresaCreada.Email,
-                FechaDeRegistro = currentTimePacific,
-                NumeroparaConfirmacion = numeroGenerado,
-                FkEmpresa = empresa.Id,
-                FkEmpresaCreada = null,
-                FkUsuario = null,
-                FkNetUserid = claims[0].Value,
-                EmailConfirmed = true,
-                PhoneNumber = postEmpresaCreada.Telefono.ToString(),
+            //var empresa = new Empresa
+            //{
+            //    EmpresaRuc = sriRepositorio.NumeroRuc,
+            //    EmpresaPropietario = sriRepositorio.RazonSocial,
+            //    EmpresaEmail = postEmpresaCreada.Email,
+            //    EmpresaEstado = true,
+            //    EmpresaUsuarioCreador = claims[0].Value,
+            //    EmpresaTelefono = postEmpresaCreada.Telefono,
 
 
-            };
-            try
-            {
-                var result = await _userManager.CreateAsync(user, postEmpresaCreada.Password);
-                if (result.Succeeded)
-                {
-                    //await emailSender.SendEmailAsync(user.Email, numeroGenerado, "");
-                    await _userManager.AddClaimAsync(user, new Claim(ClaimTypes.Role, "AdminEmpresa"));
-                    await _userManager.AddToRoleAsync(user, "AdminEmpresa");
-                    ;
-                    return Ok(new ViewEmpresaDto
-                    {
-                        Id = empresa.Id,
-                        EmpresaRuc = empresa.EmpresaRuc,
-                        EmpresaPropietario = empresa.EmpresaPropietario,
-                        EmpresaEmail = empresa.EmpresaEmail,
-                        EmpresaEstado = empresa.EmpresaEstado,
-                        EmpresaTelefono = empresa.EmpresaTelefono,
-                        EmpresaUsuarioCreador = empresa.EmpresaUsuarioCreador,
-                        Mensaje = "Usuario Empresa Creada Satisfactoriamente"
-                    });
+            //};
+            //await context.AddAsync(empresa);
+            //await context.SaveChangesAsync();
+
+            //string EmpresaCarpeta = Path.Combine(webHostEnvironment.WebRootPath, "DatosEmpresaAdmin-" + sriRepositorio.NumeroRuc);
+
+            //var user = new NetUserAditional
+            //{
+            //    UserName = postEmpresaCreada.Ruc,
+            //    Email = postEmpresaCreada.Email,
+            //    FechaDeRegistro = currentTimePacific,
+            //    NumeroparaConfirmacion = numeroGenerado,
+            //    FkEmpresa = empresa.Id,
+            //    FkEmpresaCreada = null,
+            //    FkUsuario = null,
+            //    FkNetUserid = claims[0].Value,
+            //    EmailConfirmed = true,
+            //    PhoneNumber = postEmpresaCreada.Telefono.ToString(),
 
 
-                }
-                return BadRequest("No tiene permiso para esta seccion");
+            //};
+            //try
+            //{
+            //    var result = await _userManager.CreateAsync(user, postEmpresaCreada.Password);
+            //    if (result.Succeeded)
+            //    {
+            //        //await emailSender.SendEmailAsync(user.Email, numeroGenerado, "");
+            //        await _userManager.AddClaimAsync(user, new Claim(ClaimTypes.Role, "AdminEmpresa"));
+            //        await _userManager.AddToRoleAsync(user, "AdminEmpresa");
+            //        ;
+            //        return Ok(new ViewEmpresaDto
+            //        {
+            //            Id = empresa.Id,
+            //            EmpresaRuc = empresa.EmpresaRuc,
+            //            EmpresaPropietario = empresa.EmpresaPropietario,
+            //            EmpresaEmail = empresa.EmpresaEmail,
+            //            EmpresaEstado = empresa.EmpresaEstado,
+            //            EmpresaTelefono = empresa.EmpresaTelefono,
+            //            EmpresaUsuarioCreador = empresa.EmpresaUsuarioCreador,
+            //            Mensaje = "Usuario Empresa Creada Satisfactoriamente"
+            //        });
 
-            }
-            catch (Exception ex)
-            {
 
-                return BadRequest(ex.ToString());
-            }
+            //    }
+            //    return BadRequest("No tiene permiso para esta seccion");
+
+            //}
+            //catch (Exception ex)
+            //{
+
+            //    return BadRequest(ex.ToString());
+            //}
 
 
         }
@@ -342,8 +327,8 @@ namespace Facturacion.Controllers
                     Include(x => x.FkCorreoNavigation).
                     FirstOrDefaultAsync(x => x.Id.Equals(Convert.ToInt32(claims[1].Value))
                     && x.Id.Equals(empresaCreadaIdDto.IdEmpresaCreada));
-                var srirepositorio = await context.SriRepositorios.
-                    Include(x => x.Informacionfechascontribuyente).Include(x => x.PersonaMiPyme).Include(x => x.Local)
+                var srirepositorio = await context.SriRepositorios
+
                     .FirstOrDefaultAsync(x => x.Id.Equals(empresa.FkSriRepositorio));
 
 

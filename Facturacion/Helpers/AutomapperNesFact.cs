@@ -1,10 +1,10 @@
 ﻿//using AutoMapper;
-//using NesFactApiV4.Context;
-//using NesFactApiV4.DTOs;
-//using NesFactApiV4.Model;
+//using Facturacion.Context;
+//using Facturacion.DTOs;
+//using Facturacion.Model;
 
 
-//namespace NesFactApiV4.Helpers
+//namespace Facturacion.Helpers
 //{
 //    public class AutomapperNesFact : Profile
 //    {

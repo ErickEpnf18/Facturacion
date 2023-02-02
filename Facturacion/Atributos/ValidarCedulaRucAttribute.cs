@@ -1,7 +1,7 @@
-﻿using NesFactApiV4.Services;
+﻿using Facturacion.Services;
 using System.ComponentModel.DataAnnotations;
 
-namespace NesFactApiV4.Atributos
+namespace Facturacion.Atributos
 {
     public class ValidarCedulaRucAttribute : ValidationAttribute
     {

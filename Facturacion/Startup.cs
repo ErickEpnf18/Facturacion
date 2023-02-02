@@ -32,68 +32,68 @@ namespace Facturacion
             services.AddHttpContextAccessor();
             services.AddControllers();
             services.AddHttpContextAccessor();
-  
+
             services.AddDbContext<AplicationDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            //services.AddIdentity<NetUserAditional, IdentityRole>()
+            services.AddIdentity<NetUserAditional, IdentityRole>();
 
             //.AddEntityFrameworkStores<AplicationDbContext>()
             //.AddDefaultTokenProviders();
 
-     //       services.Configure<IdentityOptions>(options =>
-     //       {
-     //           // Default Password settings.
-     //           options.Password.RequireDigit = false;
-     //           options.Password.RequireLowercase = false;
-     //           options.Password.RequireNonAlphanumeric = false;
-     //           options.Password.RequireUppercase = false;
-     //           options.Password.RequiredLength = 8;
+            //       services.Configure<IdentityOptions>(options =>
+            //       {
+            //           // Default Password settings.
+            //           options.Password.RequireDigit = false;
+            //           options.Password.RequireLowercase = false;
+            //           options.Password.RequireNonAlphanumeric = false;
+            //           options.Password.RequireUppercase = false;
+            //           options.Password.RequiredLength = 8;
 
-     //       });
-     //       services.AddAuthorization(opciones =>
-     //       {
+            //       });
+            //       services.AddAuthorization(opciones =>
+            //       {
 
-     //           opciones.AddPolicy("AdminNes", policy => policy.RequireClaim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
-     //                 "AdminEmpresaDueno", "AdminNessoft"));
+            //           opciones.AddPolicy("AdminNes", policy => policy.RequireClaim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
+            //                 "AdminEmpresaDueno", "AdminNessoft"));
 
-     //           opciones.AddPolicy("EmpresaAdmin", policy => policy.RequireClaim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
-     //     "AdminNessoft", "UsuarioEmpresa", "AdminEmpresa"));
+            //           opciones.AddPolicy("EmpresaAdmin", policy => policy.RequireClaim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
+            //     "AdminNessoft", "UsuarioEmpresa", "AdminEmpresa"));
 
-     //           opciones.AddPolicy("UsariosNesEmpresaCreada", policy => policy.RequireClaim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
-     //            "AdminEmpresaCreada", "UsuarioEmpresaCreada", "LocalEmpresaCreada", "LocalUsuarioEmpresaCreada"));
-
-
+            //           opciones.AddPolicy("UsariosNesEmpresaCreada", policy => policy.RequireClaim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
+            //            "AdminEmpresaCreada", "UsuarioEmpresaCreada", "LocalEmpresaCreada", "LocalUsuarioEmpresaCreada"));
 
 
-     //       });
-     //       services.AddAuthentication(options =>
-     //       {
-     //           options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-     //           options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-     //           options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-     //       })
-     //.AddJwtBearer(options =>
-     //{
-     //    options.SaveToken = true;
-     //    options.RequireHttpsMetadata = false;
-     //    options.TokenValidationParameters = new TokenValidationParameters
-     //    {
-     //        ValidateIssuer = false,
-     //        ValidateAudience = false,
-     //        ValidateLifetime = true,
-     //        ValidateIssuerSigningKey = true,
-     //        IssuerSigningKey = new SymmetricSecurityKey(
-     //     Encoding.UTF8.GetBytes(Configuration["jwt:key"])),
-     //        ClockSkew = TimeSpan.Zero
-     //    };
-     //});
+
+
+            //       });
+            //       services.AddAuthentication(options =>
+            //       {
+            //           options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            //           options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            //           options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            //       })
+            //.AddJwtBearer(options =>
+            //{
+            //    options.SaveToken = true;
+            //    options.RequireHttpsMetadata = false;
+            //    options.TokenValidationParameters = new TokenValidationParameters
+            //    {
+            //        ValidateIssuer = false,
+            //        ValidateAudience = false,
+            //        ValidateLifetime = true,
+            //        ValidateIssuerSigningKey = true,
+            //        IssuerSigningKey = new SymmetricSecurityKey(
+            //     Encoding.UTF8.GetBytes(Configuration["jwt:key"])),
+            //        ClockSkew = TimeSpan.Zero
+            //    };
+            //});
 
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
-       //     services.AddScoped<IInicializadorDB, InicializadorDB>();
+            //     services.AddScoped<IInicializadorDB, InicializadorDB>();
 
             services.AddSingleton<IConfiguration>(Configuration);
             //services.AddSwaggerGen(options =>
