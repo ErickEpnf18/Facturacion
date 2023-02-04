@@ -6,14 +6,29 @@ namespace Facturacion.DTOs
     public class IngresoRepoSriDto
     {
 
-   
+        [Required(ErrorMessage = "Campo requerido {0}")]
         public string RepresentanteLegal { get; set; }
+        [Required(ErrorMessage = "Campo requerido {0}")]
         public string Obligado { get; set; }
+        [Required(ErrorMessage = "Campo requerido {0}")]
         public string NombreComercial { get; set; }
+        [Required(ErrorMessage = "Campo requerido {0}")]
+        [StringLength(maximumLength: 13, MinimumLength = 13)]
+        [RegularExpression("(^[0-9]+$)", ErrorMessage = "Solo se permiten números")]
         public string NumeroRuc { get; set; }
+        [Required(ErrorMessage = "Campo requerido {0}")]
         public string AgenteRepresentante { get; set; }
+        [Required(ErrorMessage = "Campo requerido {0}")]
 
         public string RazonSocial { get; set; }
+        [Required(ErrorMessage = $"El campo Email es Requerido")]
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = $"El campo Email es Requerido")]
+
+        public string Password { get; set; }
+
 
     }
 

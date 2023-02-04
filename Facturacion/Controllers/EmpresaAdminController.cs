@@ -33,13 +33,13 @@ namespace Facturacion.Controllers
         private readonly IMapper mapper;
 
         private readonly IAlmacenadorArchivos almacenadorArchivos;
-        private readonly IEmailSender emailSender;
+   //     private readonly IEmailSender emailSender;
 
         private readonly IWebHostEnvironment webHostEnvironment;
 
         public EmpresaAdminController(UserManager<NetUserAditional> userManager,
             SignInManager<NetUserAditional> signInManager, IConfiguration configuration, AplicationDbContext context,
-            IMapper mapper, IAlmacenadorArchivos almacenadorArchivos, IEmailSender emailSender,
+            IMapper mapper, IAlmacenadorArchivos almacenadorArchivos, 
             IWebHostEnvironment webHostEnvironment)
         {
 
@@ -49,7 +49,7 @@ namespace Facturacion.Controllers
             this.context = context;
             this.mapper = mapper;
             this.almacenadorArchivos = almacenadorArchivos;
-            this.emailSender = emailSender;
+         //   this.emailSender = emailSender;
 
             this.webHostEnvironment = webHostEnvironment;
         }
@@ -70,11 +70,11 @@ namespace Facturacion.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ViewEmpresa>> PostEmpresaAdmin([FromBody] IngresoRepoSriDto ingresoRepoSriDto)
         {
-            //var curentUser = HttpContext.User;
-            //var claims = curentUser.Claims.ToList();
-            //if (claims.Count == 0)
-            //    return BadRequest("No tiene permiso para esta seccion");
-            ////  AdminEmpresaDueno
+            var curentUser = HttpContext.User;
+            var claims = curentUser.Claims.ToList();
+            if (claims.Count == 0)
+                return BadRequest("No tiene permiso para esta seccion");
+            //  AdminEmpresaDueno
 
             Random generator = new Random();
             String numeroGenerado = generator.Next(0, 100000000).ToString("D6");
@@ -113,72 +113,72 @@ namespace Facturacion.Controllers
 
             }
             return BadRequest();
-            //var identityUser = await _userManager.FindByEmailAsync(postEmpresaCreada.Email);
-            //if (identityUser != null)
-            //    return BadRequest($"Ya existe Empresa con ese  correo {identityUser.Email},Empresa= {identityUser.FkEmpresa}");
+            var identityUser = await _userManager.FindByEmailAsync(ingresoRepoSriDto.Email);
+            if (identityUser != null)
+                return BadRequest($"Ya existe Empresa con ese  correo {identityUser.Email},Empresa= {identityUser.FkEmpresa}");
 
-            //var empresa = new Empresa
-            //{
-            //    EmpresaRuc = sriRepositorio.NumeroRuc,
-            //    EmpresaPropietario = sriRepositorio.RazonSocial,
-            //    EmpresaEmail = postEmpresaCreada.Email,
-            //    EmpresaEstado = true,
-            //    EmpresaUsuarioCreador = claims[0].Value,
-            //    EmpresaTelefono = postEmpresaCreada.Telefono,
-
-
-            //};
-            //await context.AddAsync(empresa);
-            //await context.SaveChangesAsync();
-
-            //string EmpresaCarpeta = Path.Combine(webHostEnvironment.WebRootPath, "DatosEmpresaAdmin-" + sriRepositorio.NumeroRuc);
-
-            //var user = new NetUserAditional
-            //{
-            //    UserName = postEmpresaCreada.Ruc,
-            //    Email = postEmpresaCreada.Email,
-            //    FechaDeRegistro = currentTimePacific,
-            //    NumeroparaConfirmacion = numeroGenerado,
-            //    FkEmpresa = empresa.Id,
-            //    FkEmpresaCreada = null,
-            //    FkUsuario = null,
-            //    FkNetUserid = claims[0].Value,
-            //    EmailConfirmed = true,
-            //    PhoneNumber = postEmpresaCreada.Telefono.ToString(),
+            var empresa = new Empresa
+            {
+                EmpresaRuc = sriRepositorio.NumeroRuc,
+                EmpresaPropietario = sriRepositorio.RazonSocial,
+                EmpresaEmail = ingresoRepoSriDto.Email,
+                EmpresaEstado = true,
+                EmpresaUsuarioCreador = claims[0].Value,
+                EmpresaTelefono = "",
 
 
-            //};
-            //try
-            //{
-            //    var result = await _userManager.CreateAsync(user, postEmpresaCreada.Password);
-            //    if (result.Succeeded)
-            //    {
-            //        //await emailSender.SendEmailAsync(user.Email, numeroGenerado, "");
-            //        await _userManager.AddClaimAsync(user, new Claim(ClaimTypes.Role, "AdminEmpresa"));
-            //        await _userManager.AddToRoleAsync(user, "AdminEmpresa");
-            //        ;
-            //        return Ok(new ViewEmpresaDto
-            //        {
-            //            Id = empresa.Id,
-            //            EmpresaRuc = empresa.EmpresaRuc,
-            //            EmpresaPropietario = empresa.EmpresaPropietario,
-            //            EmpresaEmail = empresa.EmpresaEmail,
-            //            EmpresaEstado = empresa.EmpresaEstado,
-            //            EmpresaTelefono = empresa.EmpresaTelefono,
-            //            EmpresaUsuarioCreador = empresa.EmpresaUsuarioCreador,
-            //            Mensaje = "Usuario Empresa Creada Satisfactoriamente"
-            //        });
+            };
+            await context.AddAsync(empresa);
+            await context.SaveChangesAsync();
+
+            string EmpresaCarpeta = Path.Combine(webHostEnvironment.WebRootPath, "DatosEmpresaAdmin-" + sriRepositorio.NumeroRuc);
+
+            var user = new NetUserAditional
+            {
+                UserName = ingresoRepoSriDto.NumeroRuc,
+                Email = ingresoRepoSriDto.Email,
+                FechaDeRegistro = currentTimePacific,
+                NumeroparaConfirmacion = numeroGenerado,
+                FkEmpresa = empresa.Id,
+                FkEmpresaCreada = null,
+                FkUsuario = null,
+                FkNetUserid = claims[0].Value,
+                EmailConfirmed = true
+               
 
 
-            //    }
-            //    return BadRequest("No tiene permiso para esta seccion");
+            };
+            try
+            {
+                var result = await _userManager.CreateAsync(user, ingresoRepoSriDto.Password);
+                if (result.Succeeded)
+                {
+                    //await emailSender.SendEmailAsync(user.Email, numeroGenerado, "");
+                    await _userManager.AddClaimAsync(user, new Claim(ClaimTypes.Role, "AdminEmpresa"));
+                    await _userManager.AddToRoleAsync(user, "AdminEmpresa");
+                    ;
+                    return Ok(new ViewEmpresaDto
+                    {
+                        Id = empresa.Id,
+                        EmpresaRuc = empresa.EmpresaRuc,
+                        EmpresaPropietario = empresa.EmpresaPropietario,
+                        EmpresaEmail = empresa.EmpresaEmail,
+                        EmpresaEstado = empresa.EmpresaEstado,
+                        EmpresaTelefono = empresa.EmpresaTelefono,
+                        EmpresaUsuarioCreador = empresa.EmpresaUsuarioCreador,
+                        Mensaje = "Usuario Empresa Creada Satisfactoriamente"
+                    });
 
-            //}
-            //catch (Exception ex)
-            //{
 
-            //    return BadRequest(ex.ToString());
-            //}
+                }
+                return BadRequest("No tiene permiso para esta seccion");
+
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.ToString());
+            }
 
 
         }
